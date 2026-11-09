@@ -1,0 +1,12 @@
+services:
+  experiment:
+    build: .
+    image: kenya-vrp:dev
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    # Pin CPU count so runtime-limited solver comparisons are reproducible.
+    cpus: 2
+    command: bash
+    stdin_open: true
+    tty: true
