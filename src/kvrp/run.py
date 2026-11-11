@@ -25,7 +25,8 @@ def main():
     ap.add_argument("--csv", help="real instance CSV (overrides --sizes)")
     ap.add_argument("--depot", type=float, nargs=2, metavar=("LAT", "LON"))
     ap.add_argument("--out", default="results/run")
-    ap.add_argument("--plot", action="store_true", help="save a route map for each run")
+    ap.add_argument("--plot", action="store_true", help="save a static PNG route map for each run")
+    ap.add_argument("--map", action="store_true", help="save an interactive HTML map for each run")
     a = ap.parse_args()
 
     out = pathlib.Path(a.out)
@@ -57,6 +58,11 @@ def main():
                 print(f"{inst.name:16s} {fname:9s} {method:9s} feas={m.feasible!s:5s} "
                       f"cost={m.cost:>10,} veh={sum(m.vehicles_used.values()):>2} "
                       f"unserv={m.unserved + n_unserv}")
+            if a.map:
+                from .imap import build_map
+                build_map(sub, fleet, mats,
+                          {k: v[2] for k, v in res.items()}, out / f"{inst.name}_{fname}.html",
+                          metrics={k: v[0] for k, v in res.items()}, n_unservable=n_unserv)
             if a.plot:
                 from .plot import plot_routes
                 plot_routes(sub, fleet, res["hgs"][2], out / f"{inst.name}_{fname}_hgs.png")
